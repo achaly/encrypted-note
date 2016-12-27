@@ -1,5 +1,3 @@
-'use strict';
-
 import * as electron from 'electron';
 import * as path from 'path';
 
@@ -11,7 +9,7 @@ const BrowserWindow = electron.BrowserWindow;
 
 const debug = /--debug/.test(process.argv[2]);
 
-let mainWindow;
+let mainWindow = null;
 
 function initialize () {
     let shouldQuit = makeSingleInstance();

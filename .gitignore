@@ -1,3 +1,6 @@
-dist/
 .idea/
+.DS_Store
+.git/
+dist/
 node_modules/
+releases/
