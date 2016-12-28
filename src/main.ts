@@ -14,10 +14,9 @@ let mainWindow = null;
 function initialize () {
     let shouldQuit = makeSingleInstance();
     if (shouldQuit) {
+        console.info('App has started.');
         return app.quit();
     }
-
-    console.log('dirname', __dirname);
 
     // set config locale.
     locale.setLocale(config.getLocale());

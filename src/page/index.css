@@ -1,0 +1,87 @@
+[v-cloak] {
+    display: none !important;
+}
+
+html {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    font-family: Menlo;
+}
+
+@font-face {
+    font-family: "Menlo";
+    src: url("Menlo-Regular.ttf") format("truetype");
+}
+
+#index {
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+}
+
+#sidebar {
+    display: flex;
+    flex-direction: column;
+    width: 200px;
+    background-color: #f7e1b5;
+}
+
+#sidebar-header {
+    display: flex;
+    flex-direction: row;
+    height: 30px;
+    background-color: #9d9d9d;
+}
+
+#sidebar-list {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+}
+
+.sidebar-item {
+
+}
+
+#content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    background-color: #f8f8f8;
+}
+
+#contentHeader {
+    display: flex;
+    flex-direction: row;
+    height: 30px;
+    background-color: #9d9d9d;
+}
+
+#contentMain {
+    display: flex;
+    flex: 1;
+}
+
+#textarea {
+    padding: 5px;
+    flex: 1;
+    border: solid;
+    border-width: 1px;
+    border-color: #204d74;
+    border-radius: 0;
+    resize: none;
+}
+
+#textarea:focus {
+    outline: none;
+}

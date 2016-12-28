@@ -20,7 +20,7 @@ class Config implements IConfig {
 
     constructor() {
         this.configPath = path.join(__dirname, "../res/config/config.json");
-        console.log('dirname', __dirname);
+        console.log('configPath', __dirname);
         this.load();
     }
 
