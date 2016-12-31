@@ -25,7 +25,7 @@ gulp.task('copyRes', function () {
         .pipe(gulp.dest('dist/res'))
 });
 
-gulp.task('dev', ['clean', 'copyPage', 'copyRes'], function () {
+gulp.task('dev', ['copyPage', 'copyRes'], function () {
     let tsProject = ts.createProject("src/tsconfig.json");
 
     return tsProject.src()

@@ -33,6 +33,7 @@
   "dependencies": {
     "electron": "^1.4.8",
     "i18next": "^4.1.4",
+    "underscore": "^1.8.3",
     "vue": "^2.1.7"
   }
 }

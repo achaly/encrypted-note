@@ -4,6 +4,10 @@ import * as path from 'path';
 import {config} from "./common/config";
 import {locale} from "./common/locale";
 
+import * as querystring from "querystring";
+import * as URL from "url";
+import {MenuService} from "./common/menuService";
+
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 
@@ -36,8 +40,14 @@ function initialize () {
             // windowOptions.icon = path.join(__dirname, '/assets/app-icon/png/512.png');
         }
 
+        let url = path.join('file://', __dirname, 'page', 'index.html');
+        let query = querystring.stringify({
+            filePath: '/Users/sky/Documents/workspace/encrypted-note/tempfile.ent'
+        });
+        url += '?' + query;
+
         mainWindow = new BrowserWindow(windowOptions);
-        mainWindow.loadURL(path.join('file://', __dirname, 'page', 'index.html'));
+        mainWindow.loadURL(url);
 
         // Launch fullscreen with DevTools open, usage: npm run debug
         if (debug) {
@@ -51,6 +61,8 @@ function initialize () {
     }
 
     app.on('ready', function () {
+        new MenuService();
+
         createWindow();
         // autoUpdater.initialize();
 

@@ -6,6 +6,13 @@
     "preserveConstEnums": true,
     "sourceMap": true
   },
+  "include": [
+    "browser",
+    "common",
+    "test",
+    "typings",
+    "main.ts"
+  ],
   "exclude": [
     "../node_modules"
   ]

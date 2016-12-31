@@ -14,9 +14,9 @@
         <div id="sidebar-list">
             <ul>
                 <li v-for="item in sidebarList">
-                    <div class="sidebar-item">
-                        <h3>item.title</h3>
-                        <p>item.updatedAt</p>
+                    <div class="sidebar-item" @click="clickSidebarItem(item)">
+                        <h3>{{ item.title }}</h3>
+                        <p>{{ item.updatedAt }}</p>
                     </div>
                 </li>
             </ul>
@@ -24,10 +24,13 @@
     </div>
     <div id="content">
         <div id="content-header">
-            <button id="new-tab-btn" class="btn btn-default">newtabbtn</button>
+            <button id="content-new-tab-btn" class="btn btn-default" @click="clickNewTab">newTab</button>
+            <button id="content-save-btn" class="btn btn-default" @click="clickSave">save</button>
         </div>
         <div id="content-main">
-            <textarea id="textarea" v-model="contentText"></textarea>
+            <div id="content-editor" v-show="showEditor">
+                <textarea id="content-text-area" v-model="paperText"></textarea>
+            </div>
         </div>
     </div>
 
