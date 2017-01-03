@@ -1,32 +1,54 @@
 import BrowserWindow = Electron.BrowserWindow;
 import BrowserWindowOptions = Electron.BrowserWindowOptions;
 
-export interface IWindow {
+import * as path from 'path';
+import * as _ from "underscore";
+import * as electron from "electron";
 
+export interface IWindowConfig {
+    url: string;
+}
+
+interface IWindow {
     getBrowserWindow(): BrowserWindow
 }
 
-export class Window implements IWindow {
+export class ENWindow implements IWindow {
     private win: BrowserWindow;
 
-    constructor(url: string, option?: BrowserWindowOptions) {
+    constructor() {
+    }
+
+    static create(config: IWindowConfig, option?: BrowserWindowOptions): ENWindow {
+        let enWin = new ENWindow();
+        enWin.createWin(config, option);
+        return enWin;
+    }
+
+    static createWorkspace(): ENWindow {
+        let enWin = new ENWindow();
+        let config = {
+            url: path.join('file://', __dirname, '..', 'page', 'index.html')
+        };
+        enWin.createWin(config);
+        return enWin;
+    }
+
+    createWin(config: IWindowConfig, option?: BrowserWindowOptions): void {
         let defaultOption: BrowserWindowOptions = {
             width: 1080,
             minWidth: 680,
             height: 840,
-            title: 'xxx'
+            minHeight: 400,
+            title: electron.app.getName()
         };
 
         if (option) {
             _.extend(defaultOption, option);
         }
 
-        this.win = new BrowserWindow(defaultOption);
-        this.win.loadURL(url);
-
-        this.win.on('close', () => {
-            this.win = null;
-        });
+        this.win = new electron.BrowserWindow(defaultOption);
+        this.win.loadURL(config.url);
     }
 
     getBrowserWindow(): Electron.BrowserWindow {

@@ -4,7 +4,7 @@
   "description": "encrypted note",
   "main": "dist/main.js",
   "scripts": {
-    "dev": "electron .",
+    "dev": "gulp dev && electron .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

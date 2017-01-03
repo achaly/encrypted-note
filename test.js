@@ -1,3 +1,5 @@
+let _ = require('underscore');
+
 let x = '1234566';
 
 let y = x.substr(0, 10);
@@ -46,6 +48,21 @@ let str = ' mwo\nlk';
 //let res = /str/.exec('(.*)\s.*');
 
 // let res = str.match(/(.*?)(\s|\b|\n|\f|\r|\t|\v).*/);
-let res = str.match(/[^\s\b\n\f\r\t\v]+/);
+// let res = str.match(/[^\s\b\n\f\r\t\v]+/);
 // let res = str.match(/(\b).*/);
-console.info(res);
+// console.info(res);
+
+let x1 = {
+    a: 1,
+    b: 2,
+};
+
+let x2 = {
+    c: 3,
+}
+
+console.info(x1, x2);
+
+_.extend(x1, x2);
+
+console.info(x1, x2);

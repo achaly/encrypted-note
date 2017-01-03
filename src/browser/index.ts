@@ -1,23 +1,40 @@
+import BrowserWindow = Electron.BrowserWindow;
+import OpenDialogOptions = Electron.OpenDialogOptions;
+import SaveDialogOptions = Electron.SaveDialogOptions;
+
 import * as querystring from "querystring";
 import * as URL from "url";
 import * as Vue from "vue/dist/vue";
+import * as _ from "underscore";
+import * as electron from "electron";
+
 import {config} from "../common/config";
 import {locale} from "../common/locale";
 import {FileContent} from "../common/fileContent";
-import {remote, ipcRenderer} from "electron";
-import BrowserWindow = Electron.BrowserWindow;
-import OpenDialogOptions = Electron.OpenDialogOptions;
-import * as _ from "underscore";
 import {generateUUID} from "../common/utils";
-import {Action} from "../common/channelEnum";
+import {Action} from "../common/ipc";
+import ShowMessageBoxOptions = Electron.ShowMessageBoxOptions;
 
-remote.getCurrentWindow().webContents.openDevTools();
+electron.remote.getCurrentWindow().webContents.openDevTools();
 
 interface IWinConfig {
     filePath: string;
+    password: string;
     fileContent: FileContent;
 }
 
+function processArgs(): IWinConfig {
+    let config: IWinConfig = {
+        filePath: null,
+        password: 'encrypted-note',
+        fileContent: new FileContent()
+    };
+    let url = URL.parse(window.location.href, true);
+    if (url.query) {
+        config.filePath = url.query['filePath'];
+    }
+    return config;
+}
 const winConfig: IWinConfig = processArgs();
 
 const vue = new Vue({
@@ -30,6 +47,8 @@ const vue = new Vue({
         paperText: '',
 
         showEditor: true,
+
+        hasSaved: false,
     },
 
     computed: {
@@ -56,6 +75,7 @@ const vue = new Vue({
     watch: {
         paperText: function () {
             if (this.fileContent) {
+                this.hasSaved = false;
                 let content: FileContent = this.fileContent;
                 let paper = _.find(content.papers, (paper) => {
                     return paper.key === this.paperKey;
@@ -100,17 +120,48 @@ const vue = new Vue({
                 });
                 this.paperKey = key;
                 this.paperText = '';
+                this.hasSaved = false;
             }
         },
 
         clickSave: function (event) {
-            this.fileContent.saveToFile(winConfig.filePath)
-                .then(function () {
-                    console.log('save file success.');
-                })
-                .catch(function (e) {
-                    console.info('save file error', e);
-                })
+            this.save().then((res) => {
+                if (res) {
+                    console.info('save success.');
+
+                    this.hasSaved = true;
+                } else {
+                    console.info('save failed.');
+                }
+            }).catch((e) => {
+                console.info('save failed.', e);
+            })
+        },
+
+        save: function () {
+            return new Promise<string>((resolve, reject) => {
+                if (!winConfig.filePath) {
+                    let option: SaveDialogOptions = {
+                        filters: [
+                            {name: 'Ent Files', extensions: ['ent']}
+                        ]
+                    };
+                    electron.remote.dialog.showSaveDialog(option, (fileName) => {
+                        if (fileName) {
+                            resolve(fileName);
+                        } else {
+                            reject('cancel');
+                        }
+
+                    })
+
+                } else {
+                    resolve(winConfig.filePath);
+                }
+            }).then((filePath) => {
+                return this.fileContent.saveToFile(filePath);
+            });
+
         },
 
         clickOpenFile: function (event) {
@@ -125,7 +176,7 @@ const vue = new Vue({
                 ],
                 properties: ['openFile']
             };
-            remote.dialog.showOpenDialog(option, (fileNames) => {
+            electron.remote.dialog.showOpenDialog(option, (fileNames) => {
                 if (fileNames.length > 0) {
                     let filePath = fileNames[0];
 
@@ -177,36 +228,68 @@ const vue = new Vue({
 
 });
 
-
 function ipc() {
-    ipcRenderer.on(Action.NewTab, function () {
+    electron.ipcRenderer.on(Action.NewTab, function () {
         vue.clickNewTab();
     });
 
-    ipcRenderer.on(Action.CloseWin, function () {
-        let fileContent: FileContent = vue.fileContent;
-        fileContent.saveToFile(winConfig.filePath)
-            .then(function () {
-                console.log('save file success.');
-                remote.getCurrentWindow().close();
+    electron.ipcRenderer.on(Action.SaveFile, function () {
+        vue.clickSave();
+    });
+
+    electron.ipcRenderer.on(Action.CloseWin, function () {
+        new Promise<number>((resolve, reject) => {
+            if (vue.hasSaved) {
+                resolve(3);
+                return;
+            }
+
+            let option: ShowMessageBoxOptions = {
+                type: 'question',
+                buttons: ['save', 'donnot save', 'cancel'],
+                defaultId: 0,
+                title: 'Message',
+                message: 'Save???',
+                cancelId: 2
+            };
+            electron.remote.dialog.showMessageBox(option, (response) => {
+                resolve(response);
             })
-            .catch(function (e) {
-                console.info('save file error', e);
-            })
+
+        }).then((res) => {
+            switch (res) {
+                case 0: { // save
+                    return vue.save();
+                }
+                case 1: { // don't save
+                    electron.remote.getCurrentWindow().close();
+                    return Promise.reject('do not save');
+                }
+                case 2: { // cancel.
+                    return Promise.reject('cancel');
+                }
+                case 3: { // has saved.
+                    electron.remote.getCurrentWindow().close();
+                    return Promise.reject('has saved');
+                }
+                default: {
+                    return Promise.reject('unknown err.');
+                }
+            }
+
+        }).then((res) => {
+            if (res) {
+                console.info('save success.');
+            } else {
+                console.info('save failed.');
+            }
+
+        }).catch((e) => {
+            console.info('close win', e);
+        });
+
     })
 
 }
 
 ipc();
-
-function processArgs(): IWinConfig {
-    let config: IWinConfig = {
-        filePath: null,
-        fileContent: new FileContent()
-    };
-    let url = URL.parse(window.location.href, true);
-    if (url.query) {
-        config.filePath = url.query['filePath'];
-    }
-    return config;
-}

@@ -1,23 +1,39 @@
-import * as electron from "electron";
-import {Menu, BrowserWindow, shell, app, ipcMain} from "electron";
 import MenuItemOptions = Electron.MenuItemOptions;
 
+import * as electron from "electron";
+
+import {Action} from "./ipc";
+import {ENWindow} from "./window";
 
 export class MenuService {
-    constructor() {
+    static initialize(): void {
         let template: MenuItemOptions[] = [{
             label: 'File',
             submenu: [{
                 label: 'New File',
                 accelerator: 'CmdOrCtrl+N',
                 click: () => {
-
+                    ENWindow.createWorkspace();
                 }
             }, {
                 label: 'New Tab',
                 accelerator: 'CmdOrCtrl+T',
                 click: (menuItem, browserWindow) => {
-                    browserWindow.webContents.send('new-tab');
+                    browserWindow.webContents.send(Action.NewTab);
+                }
+            }, {
+                type: 'separator'
+            }, {
+                label: 'Save',
+                accelerator: 'CmdOrCtrl+S',
+                click: (menuItem, browserWindow) => {
+                    browserWindow.webContents.send(Action.SaveFile);
+                }
+            }, {
+                label: 'Close',
+                accelerator: 'CmdOrCtrl+W',
+                click: (menuItem, browserWindow) => {
+                    browserWindow.webContents.send(Action.CloseWin);
                 }
             }]
         }, {
@@ -55,13 +71,13 @@ export class MenuService {
             submenu: [{
                 label: 'Learn More',
                 click: function () {
-                    shell.openExternal('http://electron.atom.io')
+                    // electron.shell.openExternal('http://electron.atom.io')
                 }
             }]
         }];
 
         if (process.platform === 'darwin') {
-            const name = app.getName();
+            const name = electron.app.getName();
             template.unshift({
                 label: name,
                 submenu: [{
@@ -86,17 +102,14 @@ export class MenuService {
                     label: 'Quit',
                     accelerator: 'Command+Q',
                     click: function () {
-                        app.quit()
+                        electron.app.quit()
                     }
                 }]
             })
         }
 
-        const menu = Menu.buildFromTemplate(template);
-        Menu.setApplicationMenu(menu);
+        const menu = electron.Menu.buildFromTemplate(template);
+        electron.Menu.setApplicationMenu(menu);
     }
 
 }
-
-
-

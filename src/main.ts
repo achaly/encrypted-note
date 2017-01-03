@@ -7,6 +7,7 @@ import {locale} from "./common/locale";
 import * as querystring from "querystring";
 import * as URL from "url";
 import {MenuService} from "./common/menuService";
+import {ENWindow, IWindowConfig} from "./common/window";
 
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
@@ -29,39 +30,25 @@ function initialize () {
     app.setName(locale.get('appName'));
 
     function createWindow () {
-        let windowOptions = {
-            width: 1080,
-            minWidth: 680,
-            height: 840,
-            title: app.getName()
-        };
-
-        if (process.platform === 'linux') {
-            // windowOptions.icon = path.join(__dirname, '/assets/app-icon/png/512.png');
-        }
-
         let url = path.join('file://', __dirname, 'page', 'index.html');
         let query = querystring.stringify({
             filePath: '/Users/sky/Documents/workspace/encrypted-note/tempfile.ent'
         });
         url += '?' + query;
 
-        mainWindow = new BrowserWindow(windowOptions);
-        mainWindow.loadURL(url);
+        let winConfig: IWindowConfig = {
+            url: url
+        };
+        let window = ENWindow.create(winConfig);
+        mainWindow = window.getBrowserWindow();
 
-        // Launch fullscreen with DevTools open, usage: npm run debug
-        if (debug) {
-            mainWindow.webContents.openDevTools()
-            mainWindow.maximize()
-        }
-
-        mainWindow.on('closed', function () {
-            mainWindow = null
+        mainWindow.on('close', () => {
+            mainWindow = null;
         });
     }
 
     app.on('ready', function () {
-        new MenuService();
+        MenuService.initialize();
 
         createWindow();
         // autoUpdater.initialize();
