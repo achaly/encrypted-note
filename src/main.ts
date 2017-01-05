@@ -42,7 +42,7 @@ function initialize () {
         let window = ENWindow.create(winConfig);
         mainWindow = window.getBrowserWindow();
 
-        mainWindow.on('close', () => {
+        mainWindow.on('closed', () => {
             mainWindow = null;
         });
     }

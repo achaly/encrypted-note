@@ -2,14 +2,15 @@
 <html>
 <head>
     <link rel="stylesheet" href="assets/bootstrap.3.3.7.min.css">
+    <link rel="stylesheet" href="assets/alertify.min.1.8.0.css">
     <link rel="stylesheet" href="assets/index.css">
 </head>
 <body>
 <div id="index" v-cloak>
     <div id="sidebar">
         <div id="sidebar-header">
-            <button id="baidu-btn" class="btn btn-default">syncbaidu</button>
-            <button id="drop-btn" class="btn btn-default">syncdrop</button>
+            <button id="baidu-btn" class="btn btn-default" @click="clickBaidu">syncbaidu</button>
+            <button id="drop-btn" class="btn btn-default" @click="clickDrop">syncdrop</button>
         </div>
         <div id="sidebar-list">
             <ul>
@@ -34,7 +35,7 @@
         </div>
     </div>
 
-    <script type="text/javascript" src="../browser/index.js"></script>
 </div>
+<script type="text/javascript" src="../browser/index.js"></script>
 </body>
 </html>

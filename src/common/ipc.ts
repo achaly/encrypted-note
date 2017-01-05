@@ -28,6 +28,12 @@ export class Action {
     static DelTab: string = 'del-tab';
 
     /**
+     * open new file.
+     * @type {string}
+     */
+    static OpenFile: string = 'open-file';
+
+    /**
      * save file.
      * @type {string}
      */

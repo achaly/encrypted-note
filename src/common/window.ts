@@ -1,9 +1,10 @@
-import BrowserWindow = Electron.BrowserWindow;
-import BrowserWindowOptions = Electron.BrowserWindowOptions;
-
 import * as path from 'path';
+import * as querystring from "querystring";
 import * as _ from "underscore";
 import * as electron from "electron";
+
+import BrowserWindow = Electron.BrowserWindow;
+import BrowserWindowOptions = Electron.BrowserWindowOptions;
 
 export interface IWindowConfig {
     url: string;
@@ -25,11 +26,19 @@ export class ENWindow implements IWindow {
         return enWin;
     }
 
-    static createWorkspace(): ENWindow {
+    static createWorkspace(query?: {filePath: string}): ENWindow {
+        let url = path.join('file://', __dirname, '../page', 'index.html');
+        if (query) {
+            let q = querystring.stringify({
+                filePath: query.filePath
+            });
+            url += '?' + q;
+        }
         let enWin = new ENWindow();
         let config = {
-            url: path.join('file://', __dirname, '..', 'page', 'index.html')
+            url: url
         };
+
         enWin.createWin(config);
         return enWin;
     }

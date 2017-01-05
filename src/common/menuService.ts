@@ -16,6 +16,12 @@ export class MenuService {
                     ENWindow.createWorkspace();
                 }
             }, {
+                label: 'Open File',
+                accelerator: 'CmdOrCtrl+O',
+                click: (menuItem, browserWindow) => {
+                    browserWindow.webContents.send(Action.OpenFile);
+                }
+            }, {
                 label: 'New Tab',
                 accelerator: 'CmdOrCtrl+T',
                 click: (menuItem, browserWindow) => {

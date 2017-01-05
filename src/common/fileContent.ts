@@ -10,7 +10,7 @@ export class FileContent {
         this.papers = [{key: generateUUID(), text: '', createdAt: 0, updatedAt: 0}];
     }
 
-    loadFromFile(filePath: string): Promise<FileContent> {
+    loadFromFile(filePath: string, password?: string): Promise<FileContent> {
         return new Promise((resolve, reject) => {
             fs.readFile(filePath, (err, data) => {
                 if (data) {
@@ -40,7 +40,7 @@ export class FileContent {
         });
     }
 
-    saveToFile(filePath: string): Promise<boolean> {
+    saveToFile(filePath: string, password?: string): Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
             // encrpyt
             let encrpytedText = JSON.stringify(this);
