@@ -1,9 +1,10 @@
 'use strict';
 
-let gulp = require("gulp");
-let ts = require("gulp-typescript");
-let uglify = require('gulp-uglify');
-let path = require('path');
+const gulp = require("gulp");
+const ts = require("gulp-typescript");
+const uglify = require('gulp-uglify');
+const path = require('path');
+const _ = require('underscore');
 
 gulp.task("default", function () {
     console.info('default gulp task');
@@ -45,44 +46,52 @@ gulp.task('release', ['clean', 'copyPage', 'copyRes'], function () {
         .pipe(gulp.dest("dist"));
 });
 
+/**
+ * electron packager.
+ */
 const packager = require('electron-packager');
-let ignoreFiles = [
-    '/releases',
-    '/src',
-    '/.git',
-    '/src',
-    '/.gitignore',
-    '/gulpfile.js',
-    '/npm-debug.log',
-    '/tools.js',
-    '/.DS_Store',
-    '/.idea'
-];
 
-let ignoreFunc = function(filepath) {
+const ignoreFunc = function(filepath) {
+    const ignoreFiles = [
+        '/.DS_Store',
+        '/.git',
+        '/.gitignore',
+        '/.idea',
+        '/releases',
+        '/src',
+        '/gulpfile.js',
+        '/package.json',
+        '/npm-debug.log',
+        '/dist/test',
+    ];
     return ignoreFiles.indexOf(filepath) > -1;
 };
 
-gulp.task('pack-mac', ['release'], function () {
-    const settingsMac = {
-        dir: __dirname,
-        version: '1.4.8',
-        prune: true,
-        out: path.join(__dirname, 'releases'),
-        overwrite: true,
-        asar: true,
-        ignore: ignoreFunc,
-        download: {
-            mirror: 'https://npm.taobao.org/mirrors/electron/'
-        },
-        'app-copyright': 'Copyright by Sky.',
+const config = {
+    dir: __dirname,
+    version: '1.4.8',
+    prune: true,
+    out: path.join(__dirname, 'releases'),
+    overwrite: true,
+    asar: true,
+    ignore: ignoreFunc,
+    download: {
+        mirror: 'https://npm.taobao.org/mirrors/electron/'
+    },
+    'app-copyright': 'Copyright by Sky.',
 
-        name: 'Encrypted Note',
-        icon: '',
+    name: 'Encrypted Note',
+    icon: '',
+    platform: 'darwin',
+    arch: 'x64',
+    'app-version': '0.0.1',
+    'build-version': '0.0.1',
+};
+
+gulp.task('pack-mac', ['release'], function () {
+    const settingsMac = _.extend({}, config, {
         platform: 'darwin',
         arch: 'x64',
-        'app-version': '0.0.1',
-        'build-version': '0.0.1',
 
         'app-bundle-id': '',
         'app-category-type': 'public.app-category.lifestyle',
@@ -92,7 +101,7 @@ gulp.task('pack-mac', ['release'], function () {
         // 'osx-sign': true,
         'protocol': [],
         'protocol-name': [],
-    };
+    });
 
     packager(settingsMac, function (err, appPaths) {
         if (!err) {
@@ -104,25 +113,10 @@ gulp.task('pack-mac', ['release'], function () {
 });
 
 gulp.task('pack-linux', ['release'], function () {
-    const settingsLinux = {
-        dir: __dirname,
-        version: '1.4.8',
-        prune: true,
-        out: path.join(__dirname, 'releases'),
-        overwrite: true,
-        asar: true,
-        ignore: ignoreFunc,
-        download: {
-            mirror: 'https://npm.taobao.org/mirrors/electron/'
-        },
-        'app-copyright': 'Copyright by Sky.',
-
-        name: 'Encrypted Note',
+    const settingsLinux = _.extend({}, config, {
         platform: 'linux',
         arch: 'ia32',
-        'app-version': '0.0.1',
-        'build-version': '0.0.1',
-    };
+    });
 
     packager(settingsLinux, function (err, appPaths) {
         if (!err) {
@@ -134,34 +128,18 @@ gulp.task('pack-linux', ['release'], function () {
 });
 
 gulp.task('pack-win', ['release'], function () {
-    const settingsWin32 = {
-        dir: __dirname,
-        version: '1.4.8',
-        prune: true,
-        out: path.join(__dirname, 'releases'),
-        overwrite: true,
-        asar: false,
-        ignore: ignoreFunc,
-        download: {
-            mirror: 'https://npm.taobao.org/mirrors/electron/'
-        },
-        'app-copyright': 'Copyright by Sky.',
-
-        name: 'Encrypted Note',
-        icon: '',
+    const settingsWin32 = _.extend({}, config, {
         platform: 'win32',
         arch: 'ia32',
-        'app-version': '0.0.1',
-        'build-version': '0.0.1',
 
         'win32metadata': {
-            CompanyName: 'Xiaomi',
-            FileDescription: 'SmartHomePC',
+            CompanyName: 'Sky',
+            FileDescription: 'Encrypted Note',
             OriginalFilename: '',
-            ProductName: 'SmartHomePC',
-            InternalName: 'smart-home-pc'
+            ProductName: 'Encrypted Note',
+            InternalName: 'Encrypted Note'
         }
-    };
+    });
 
     packager(settingsWin32, function (err, appPaths) {
         if (!err) {

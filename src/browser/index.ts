@@ -11,7 +11,7 @@ import {FileContent} from "../common/fileContent";
 import {generateUUID} from "../common/utils";
 import {Action} from "../common/ipc";
 import {ENWindow, IWindowConfig} from "../common/window";
-// import dialog from "../common/dialog";
+import {dialog} from "../common/dialog";
 
 import BrowserWindow = Electron.BrowserWindow;
 import OpenDialogOptions = Electron.OpenDialogOptions;
@@ -77,11 +77,11 @@ new Vue({
         clickBaidu(event): void {
             console.info('baidu');
 
-            // dialog.test();
+            dialog.test();
         },
 
         clickDrop(event): void {
-            // dialog.test2();
+            dialog.test2();
         },
 
         processArgs(): void {

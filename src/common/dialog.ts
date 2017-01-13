@@ -1,17 +1,14 @@
-export default new Dialog();
-
 const html = `
-
 
 `;
 
 class Dialog {
 
-    id: string = 'dialog-xxxooo';
+    dialogId: string = 'dialog-xxxooo';
 
     test(): void {
         let div = document.createElement('div');
-        div.setAttribute('id', this.id);
+        div.setAttribute('dialogId', this.dialogId);
         div.innerHTML = html;
 
         this.append(div);
@@ -27,12 +24,16 @@ class Dialog {
     }
 
     remove(): void {
-        let d = document.getElementById(this.id);
+        let d = document.getElementById(this.dialogId);
         d.remove()
     }
 
-    show(): void {
-
+    show(message: string, callback: (event, value) => void, cancel: (event) => void): void {
+        let div = document.createElement('div');
+        div.setAttribute('dialogId', this.dialogId);
+        div.innerHTML = html;
     }
 
 }
+
+export const dialog = new Dialog();
