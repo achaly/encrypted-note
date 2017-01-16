@@ -3,35 +3,53 @@
 <head>
     <link rel="stylesheet" href="assets/bootstrap.3.3.7.min.css">
     <link rel="stylesheet" href="assets/alertify.min.1.8.0.css">
+    <link rel="stylesheet" href="assets/font-awesome-4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="assets/index.css">
 </head>
 <body>
 <div id="index" v-cloak>
-    <div id="sidebar">
-        <div id="sidebar-header">
-            <button id="baidu-btn" class="btn btn-default" @click="clickBaidu">syncbaidu</button>
-            <button id="drop-btn" class="btn btn-default" @click="clickDrop">syncdrop</button>
+    <div id="ws-header">
+        <div id="ws-header-left">
+            <button id="ws-btn-open" class="btn btn-default ws-btn-cls" @click="clickOpenFile">
+                <span class="fa fa-files-o fa-2x"></span>
+            </button>
+            <button id="ws-btn-save" class="btn btn-default ws-btn-cls" @click="clickSave">
+                <span class="fa fa-floppy-o fa-2x"></span>
+            </button>
         </div>
-        <div id="sidebar-list">
+
+        <div id="ws-header-right">
+            <button id="ws-btn-tab" class="btn btn-default ws-btn-cls" @click="clickNewTab">
+                <span class="fa fa-paperclip fa-2x"></span>
+            </button>
+            <button id="ws-btn-del" class="btn btn-default ws-btn-cls" @click="clickDel">
+                <span class="fa fa-trash-o fa-2x"></span>
+            </button>
+        </div>
+
+        <!--<button id="baidu-btn" class="btn btn-default" @click="clickBaidu">syncbaidu</button>-->
+        <!--<button id="drop-btn" class="btn btn-default" @click="clickDrop">syncdrop</button>-->
+        <!--<button id="content-new-tab-btn" class="btn btn-default" @click="clickNewTab">newTab</button>-->
+        <!--<button id="content-save-btn" class="btn btn-default" @click="clickSave">save</button>-->
+    </div>
+
+    <div id="ws-content">
+        <div id="ws-sidebar">
             <ul>
                 <li v-for="item in sidebarList">
-                    <div class="sidebar-item" @click="clickSidebarItem(item)">
+                    <div class="ws-sidebar-item" v-bind:class="item.selected" @click="clickSidebarItem(item)">
                         <h3>{{ item.title }}</h3>
-                        <p>{{ item.updatedAt }}</p>
+                        <p>{{ item.createdAt }}</p>
                     </div>
                 </li>
             </ul>
         </div>
-    </div>
-    <div id="content">
-        <div id="content-header">
-            <button id="content-new-tab-btn" class="btn btn-default" @click="clickNewTab">newTab</button>
-            <button id="content-save-btn" class="btn btn-default" @click="clickSave">save</button>
-        </div>
-        <div id="content-main">
-            <div id="content-editor" v-show="showEditor">
-                <textarea id="content-text-area" v-model="paperText"></textarea>
+        <div id="ws-editor">
+            <div id="ws-editor-header"></div>
+            <div id="ws-editor-main">
+                <textarea id="ws-editor-main-textarea" v-model="paperText"></textarea>
             </div>
+            <div id="ws-editor-footer"></div>
         </div>
     </div>
 

@@ -26,8 +26,142 @@ body {
 #index {
     display: flex;
     flex: 1;
+    flex-direction: column;
+    background-color: rgba(248, 248, 248, 0.5);
+}
+
+#ws-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 50px;
+    background-color: rgba(246, 246, 246, 1);
+    border-bottom: solid 1px rgba(157, 157, 157, 0.5);
+}
+
+#ws-header-left {
+    width: 300px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 5px;
+}
+
+#ws-header-right {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 5px;
+}
+
+.ws-btn-cls {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: none;
+    background-color: rgba(246, 246, 246, 1);
+    outline: none;
+}
+
+.ws-btn-cls:focus {
+    outline: 0 !important;
+}
+
+#ws-content {
+    display: flex;
+    flex: 1;
     flex-direction: row;
 }
+
+#ws-sidebar {
+    display: flex;
+    width: 300px;
+}
+
+#ws-sidebar ul {
+    flex: 1;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+#ws-sidebar li {
+    height: 70px;
+    margin: 0;
+    padding: 0;
+}
+
+.ws-sidebar-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    height: 100%;
+}
+
+.ws-sidebar-item h3 {
+    font-size: 24px;
+    margin: 0 30px;
+    padding: 10px 0 0 0;
+}
+
+.ws-sidebar-item p {
+    font-size: 14px;
+    margin: 0 30px;
+    padding: 0 0 10px 0;
+    border-bottom: solid 1px rgba(229, 229, 229, 1);
+}
+
+.ws-sidebar-item-selected {
+    background-color: rgba(229, 229, 229, 1);
+    outline: solid 1px rgba(229, 229, 229, 1);
+}
+
+#ws-editor {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+
+    border-left: solid 1px rgba(157, 157, 157, 0.5);
+}
+
+#ws-editor-header {
+    height: 10px;
+}
+
+#ws-editor-main {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+#ws-editor-main-textarea {
+    font-size: 16px;
+    padding: 30px;
+    flex: 1;
+    border: none;
+    resize: none;
+    background-color: rgba(248, 248, 248, 0.5);
+}
+
+#ws-editor-main-textarea:focus {
+    outline: none;
+}
+
+#ws-editor-footer {
+    height: 10px;
+}
+
+
+
+
+
+
+
+
+
+
 
 #sidebar {
     display: flex;

@@ -8,7 +8,7 @@ import * as alertify from "alertifyjs";
 import {config} from "../common/config";
 import {locale} from "../common/locale";
 import {FileContent} from "../common/fileContent";
-import {generateUUID} from "../common/utils";
+import {generateUUID, genrateDate} from "../common/utils";
 import {Action} from "../common/ipc";
 import {ENWindow, IWindowConfig} from "../common/window";
 import {dialog} from "../common/dialog";
@@ -41,15 +41,20 @@ new Vue({
             let list = [];
             if (this.fileContent) {
                 let content: FileContent = this.fileContent;
+                let key = this.paperKey;
                 _.forEach(content.papers, function (paper) {
                     let m = paper.text.substr(0, 10).match(/[^\s\b\n\f\r\t\v]+/);
                     let title = m ? m[0] : '';
+                    let createdAt = paper.createdAt > 0 ? genrateDate(paper.createdAt) : '';
+                    let updatedAt = paper.updatedAt > 0 ? genrateDate(paper.updatedAt) : '';
+                    let selected = key == paper.key ? 'ws-sidebar-item-selected': null;
                     list.push({
                         key: paper.key,
                         title: title,
-                        createdAt: paper.createdAt,
-                        updatedAt: paper.updatedAt,
-                        text: paper.text
+                        createdAt: createdAt,
+                        updatedAt: updatedAt,
+                        text: paper.text,
+                        selected: selected
                     })
                 });
             }
@@ -60,8 +65,9 @@ new Vue({
     watch: {
         paperText: function () {
             if (this.fileContent) {
-                this.hasSaved = false;
-                this.canClose = false;
+                console.info('watch paper text');
+                // this.hasSaved = false;
+                // this.canClose = false;
                 let content: FileContent = this.fileContent;
                 let paper = _.find(content.papers, (paper) => {
                     return paper.key === this.paperKey;
@@ -70,6 +76,11 @@ new Vue({
                     paper.text = this.paperText;
                 }
             }
+        },
+
+        fileContent: function () {
+            console.info('file content changed.');
+            this.hasSaved = false;
         }
     },
 
@@ -77,7 +88,7 @@ new Vue({
         clickBaidu(event): void {
             console.info('baidu');
 
-            dialog.test();
+            // dialog.test();
         },
 
         clickDrop(event): void {
@@ -226,6 +237,10 @@ new Vue({
                 this.paperText = '';
                 this.hasSaved = false;
             }
+        },
+
+        clickDel(event): void {
+            console.info('del tab');
         },
 
         clickSave(event): void {
