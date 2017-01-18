@@ -60,7 +60,6 @@ const ignoreFunc = function(filepath) {
         '/releases',
         '/src',
         '/gulpfile.js',
-        '/package.json',
         '/npm-debug.log',
         '/dist/test',
     ];
@@ -69,7 +68,7 @@ const ignoreFunc = function(filepath) {
 
 const config = {
     dir: __dirname,
-    version: '1.4.8',
+    version: require('./package.json').electronVersion,
     prune: true,
     out: path.join(__dirname, 'releases'),
     overwrite: true,

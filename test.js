@@ -52,17 +52,34 @@ let str = ' mwo\nlk';
 // let res = str.match(/(\b).*/);
 // console.info(res);
 
-let x1 = {
+// let x1 = {
+//     a: 1,
+//     b: 2,
+// };
+//
+// let x2 = {
+//     c: 3,
+// }
+//
+// console.info(x1, x2);
+//
+// _.extend(x1, x2);
+//
+// console.info(x1, x2);
+
+let a1 = {
     a: 1,
     b: 2,
-};
-
-let x2 = {
-    c: 3,
 }
 
-console.info(x1, x2);
+let b1 = {
+    c: 3,
+    d: 4,
+};
 
-_.extend(x1, x2);
+let ss = JSON.stringify(a1) + ',' + JSON.stringify(b1);
 
-console.info(x1, x2);
+console.info(ss);
+
+let sy = JSON.parse(ss);
+console.info(sy)

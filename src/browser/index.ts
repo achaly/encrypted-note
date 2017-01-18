@@ -18,14 +18,17 @@ import OpenDialogOptions = Electron.OpenDialogOptions;
 import SaveDialogOptions = Electron.SaveDialogOptions;
 import ShowMessageBoxOptions = Electron.ShowMessageBoxOptions;
 
-electron.remote.getCurrentWindow().webContents.openDevTools();
+const debug = /--debug/.test(process.argv[2]);
+if (debug) {
+    electron.remote.getCurrentWindow().webContents.openDevTools();
+}
 
 new Vue({
     el: '#index',
     data: {
         filePath: null,
         fileContent: null,
-        password: null,
+        password: 'default',
 
         paperKey: '',
         paperText: '',
@@ -66,22 +69,23 @@ new Vue({
         paperText: function () {
             if (this.fileContent) {
                 console.info('watch paper text');
-                // this.hasSaved = false;
-                // this.canClose = false;
                 let content: FileContent = this.fileContent;
                 let paper = _.find(content.papers, (paper) => {
                     return paper.key === this.paperKey;
                 });
                 if (paper) {
-                    paper.text = this.paperText;
+                    if (!_.isEqual(paper.text, this.paperText)) {
+                        paper.text = this.paperText;
+                        this.hasSaved = false;
+                        this.canClose = false;
+
+                        let date = Date.now();
+                        paper.createdAt = paper.createdAt === 0 ? date : paper.createdAt;
+                        paper.updatedAt = date;
+                    }
                 }
             }
         },
-
-        fileContent: function () {
-            console.info('file content changed.');
-            this.hasSaved = false;
-        }
     },
 
     methods: {
@@ -89,6 +93,13 @@ new Vue({
             console.info('baidu');
 
             // dialog.test();
+        },
+
+        onTabClick(event): void {
+            let textarea: HTMLTextAreaElement = <HTMLTextAreaElement>document.getElementById('ws-editor-main-textarea');
+            let s = textarea.selectionStart;
+            textarea.value = textarea.value.substring(0, textarea.selectionStart) + '\t' + textarea.value.substring(textarea.selectionEnd);
+            textarea.selectionEnd = s + 1;
         },
 
         clickDrop(event): void {
@@ -115,6 +126,7 @@ new Vue({
 
             // mouse click x.
             window.onbeforeunload = (e) => {
+                console.log('window.onbeforeunload');
                 if (this.canClose) {
                     return null;
 
@@ -173,7 +185,9 @@ new Vue({
                     }
                     case 1: { // don't save
                         this.canClose = true;
-                        electron.remote.getCurrentWindow().close();
+                        setTimeout(() => {
+                            electron.remote.getCurrentWindow().close();
+                        }, 0);
                         return Promise.reject('do not save');
                     }
                     case 2: { // cancel.
@@ -181,7 +195,9 @@ new Vue({
                     }
                     case 3: { // has saved.
                         this.canClose = true;
-                        electron.remote.getCurrentWindow().close();
+                        setTimeout(() => {
+                            electron.remote.getCurrentWindow().close();
+                        }, 0);
                         return Promise.reject('has saved');
                     }
                     default: {
@@ -240,7 +256,19 @@ new Vue({
         },
 
         clickDel(event): void {
-            console.info('del tab');
+            let content: FileContent = this.fileContent;
+            if (content.papers.length === 1) {
+                this.paperText = '';
+                content.papers[0].text = '';
+                content.papers[0].createdAt = 0;
+                content.papers[0].updatedAt = 0;
+            } else {
+                content.papers = _.filter(content.papers, (paper) => {
+                    return !_.isEqual(paper.key, this.paperKey);
+                });
+                this.paperKey = content.papers[0].key;
+                this.paperText = content.papers[0].text;
+            }
         },
 
         clickSave(event): void {
@@ -267,6 +295,7 @@ new Vue({
                     };
                     electron.remote.dialog.showSaveDialog(option, (fileName) => {
                         if (fileName) {
+                            this.filePath = fileName;
                             resolve(fileName);
                         } else {
                             reject('cancel');
@@ -304,6 +333,10 @@ new Vue({
 
         },
 
+        clickNewFile(event): void {
+            electron.ipcRenderer.send(Action.NewWin);
+        },
+
         clickOpenFile(event): void {
             console.info('click open file');
 
@@ -333,7 +366,7 @@ new Vue({
                     this.load(fileName);
 
                 } else {
-                    ENWindow.createWorkspace({filePath: fileName});
+                    electron.ipcRenderer.send(Action.OpenFile, fileName);
                 }
             });
         },

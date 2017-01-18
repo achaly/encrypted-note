@@ -10,20 +10,23 @@
 <div id="index" v-cloak>
     <div id="ws-header">
         <div id="ws-header-left">
+            <button id="ws-btn-new" class="btn btn-default ws-btn-cls" @click="clickNewFile">
+                <span class="fa fa-file-o fa-lg"></span>
+            </button>
             <button id="ws-btn-open" class="btn btn-default ws-btn-cls" @click="clickOpenFile">
-                <span class="fa fa-files-o fa-2x"></span>
+                <span class="fa fa-folder-open-o fa-lg"></span>
             </button>
             <button id="ws-btn-save" class="btn btn-default ws-btn-cls" @click="clickSave">
-                <span class="fa fa-floppy-o fa-2x"></span>
+                <span class="fa fa-floppy-o fa-lg"></span>
             </button>
         </div>
 
         <div id="ws-header-right">
             <button id="ws-btn-tab" class="btn btn-default ws-btn-cls" @click="clickNewTab">
-                <span class="fa fa-paperclip fa-2x"></span>
+                <span class="fa fa-paperclip fa-lg"></span>
             </button>
             <button id="ws-btn-del" class="btn btn-default ws-btn-cls" @click="clickDel">
-                <span class="fa fa-trash-o fa-2x"></span>
+                <span class="fa fa-trash-o fa-lg"></span>
             </button>
         </div>
 
@@ -47,7 +50,7 @@
         <div id="ws-editor">
             <div id="ws-editor-header"></div>
             <div id="ws-editor-main">
-                <textarea id="ws-editor-main-textarea" v-model="paperText"></textarea>
+                <textarea id="ws-editor-main-textarea" v-model="paperText" @keydown.tab.prevent="onTabClick"></textarea>
             </div>
             <div id="ws-editor-footer"></div>
         </div>

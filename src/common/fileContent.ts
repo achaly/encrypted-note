@@ -2,11 +2,12 @@ import * as fs from "fs";
 import {generateUUID} from "./utils";
 
 export class FileContent {
-    config: {fileName: string};
-    papers: {key: string, createdAt: number, updatedAt: number, text: string}[];
+    config: {encrypted: boolean};
+    papers?: {key: string, createdAt: number, updatedAt: number, text: string}[];
+    ciphertext?: string;
 
     constructor() {
-        this.config = {fileName: null};
+        this.config = {encrypted: false};
         this.papers = [{key: generateUUID(), text: '', createdAt: 0, updatedAt: 0}];
     }
 

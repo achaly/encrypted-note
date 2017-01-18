@@ -1,4 +1,7 @@
 import MenuItemOptions = Electron.MenuItemOptions;
+import OpenDialogOptions = Electron.OpenDialogOptions;
+import SaveDialogOptions = Electron.SaveDialogOptions;
+import ShowMessageBoxOptions = Electron.ShowMessageBoxOptions;
 
 import * as electron from "electron";
 
@@ -13,13 +16,13 @@ export class MenuService {
                 label: 'New File',
                 accelerator: 'CmdOrCtrl+N',
                 click: () => {
-                    ENWindow.createWorkspace();
+                    ENWindow.createWorkspace().then((win) => {});
                 }
             }, {
                 label: 'Open File',
                 accelerator: 'CmdOrCtrl+O',
                 click: (menuItem, browserWindow) => {
-                    browserWindow.webContents.send(Action.OpenFile);
+                    ENWindow.createWorkspace(true).then((win) => {});
                 }
             }, {
                 label: 'New Tab',

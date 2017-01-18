@@ -5,63 +5,75 @@ import * as electron from "electron";
 
 import BrowserWindow = Electron.BrowserWindow;
 import BrowserWindowOptions = Electron.BrowserWindowOptions;
+import OpenDialogOptions = Electron.OpenDialogOptions;
 
 export interface IWindowConfig {
+    title: string;
     url: string;
 }
 
-interface IWindow {
-    getBrowserWindow(): BrowserWindow
-}
+export class ENWindow {
 
-export class ENWindow implements IWindow {
-    private win: BrowserWindow;
-
-    constructor() {
+    static create(config: IWindowConfig, option?: BrowserWindowOptions): Promise<BrowserWindow> {
+        return Promise.resolve(ENWindow.createWin(config, option));
     }
 
-    static create(config: IWindowConfig, option?: BrowserWindowOptions): ENWindow {
-        let enWin = new ENWindow();
-        enWin.createWin(config, option);
-        return enWin;
-    }
-
-    static createWorkspace(query?: {filePath: string}): ENWindow {
-        let url = path.join('file://', __dirname, '../page', 'index.html');
-        if (query) {
-            let q = querystring.stringify({
-                filePath: query.filePath
+    static createWorkspace(showDialog: boolean = false, query?: {filePath: string}): Promise<BrowserWindow> {
+        return new Promise<string>((resolve, reject) => {
+            if (!showDialog) {
+                resolve();
+                return;
+            }
+            let option: OpenDialogOptions = {
+                title: 'open file',
+                filters: [
+                    {name: 'Ent Files', extensions: ['ent']},
+                    // {name: 'All Files', extensions: ['*']}
+                ],
+                properties: ['openFile']
+            };
+            electron.dialog.showOpenDialog(option, (fileNames) => {
+                if (fileNames && fileNames.length > 0) {
+                    resolve(fileNames[0]);
+                } else {
+                    resolve();
+                }
             });
-            url += '?' + q;
-        }
-        let enWin = new ENWindow();
-        let config = {
-            url: url
-        };
 
-        enWin.createWin(config);
-        return enWin;
+        }).then((res) => {
+            let filePath = res || (query && query.filePath) || null;
+            let url = path.join('file://', __dirname, '../page', 'index.html');
+            if (filePath) {
+                let q = querystring.stringify({
+                    filePath: filePath
+                });
+                url += '?' + q;
+            }
+            let config = {
+                title: electron.app.getName(),
+                url: url
+            };
+
+            return ENWindow.createWin(config);
+        });
     }
 
-    createWin(config: IWindowConfig, option?: BrowserWindowOptions): void {
+    static createWin(config: IWindowConfig, option?: BrowserWindowOptions): BrowserWindow {
         let defaultOption: BrowserWindowOptions = {
             width: 1080,
             minWidth: 680,
             height: 840,
             minHeight: 400,
-            title: electron.app.getName()
+            title: 'xxxooo'
         };
 
         if (option) {
             _.extend(defaultOption, option);
         }
 
-        this.win = new electron.BrowserWindow(defaultOption);
-        this.win.loadURL(config.url);
-    }
-
-    getBrowserWindow(): Electron.BrowserWindow {
-        return this.win;
+        let win: BrowserWindow = new electron.BrowserWindow(defaultOption);
+        win.loadURL(config.url);
+        return win;
     }
 
 }

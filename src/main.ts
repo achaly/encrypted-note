@@ -1,54 +1,43 @@
 import * as electron from 'electron';
 import * as path from 'path';
+import * as querystring from "querystring";
+import * as URL from "url";
 
 import {config} from "./common/config";
 import {locale} from "./common/locale";
-
-import * as querystring from "querystring";
-import * as URL from "url";
 import {MenuService} from "./common/menuService";
 import {ENWindow, IWindowConfig} from "./common/window";
-
-const app = electron.app;
-const BrowserWindow = electron.BrowserWindow;
+import {initIpcMain} from "./common/ipc";
 
 const debug = /--debug/.test(process.argv[2]);
 
-let mainWindow = null;
+let mainWindow: Electron.BrowserWindow = null;
 
 function initialize () {
     let shouldQuit = makeSingleInstance();
     if (shouldQuit) {
         console.info('App has started.');
-        return app.quit();
+        return electron.app.quit();
     }
 
     // set config locale.
     locale.setLocale(config.getLocale());
 
     console.info('app name', locale.get('appName'));
-    app.setName(locale.get('appName'));
+    electron.app.setName(locale.get('appName'));
 
     function createWindow () {
-        let url = path.join('file://', __dirname, 'page', 'index.html');
-        let query = querystring.stringify({
-            filePath: '/Users/sky/Documents/workspace/encrypted-note/tempfile.ent'
-        });
-        url += '?' + query;
-
-        let winConfig: IWindowConfig = {
-            url: url
-        };
-        let window = ENWindow.create(winConfig);
-        mainWindow = window.getBrowserWindow();
-
-        mainWindow.on('closed', () => {
-            mainWindow = null;
+        let testFilePath = '/Users/sky/Documents/workspace/encrypted-note/tempfile.ent';
+        ENWindow.createWorkspace(/*false, {filePath: testFilePath}*/).then((win) => {
+            console.log('create win.');
+        }, (e) => {
+            console.log('create win error.', e);
         });
     }
 
-    app.on('ready', function () {
+    electron.app.on('ready', function () {
         MenuService.initialize();
+        initIpcMain();
 
         createWindow();
         // autoUpdater.initialize();
@@ -56,19 +45,19 @@ function initialize () {
         // miotServer.open();
     });
 
-    app.on('window-all-closed', function () {
+    electron.app.on('window-all-closed', function () {
         if (process.platform !== 'darwin') {
-            app.quit();
+            electron.app.quit();
         }
     });
 
-    app.on('activate', function () {
-        if (mainWindow === null) {
+    electron.app.on('activate', function () {
+        if (electron.BrowserWindow.getAllWindows().length === 0) {
             createWindow();
         }
     });
 
-    app.on('quit', function () {
+    electron.app.on('quit', function () {
         // miotServer.close();
     })
 }
@@ -85,12 +74,14 @@ function makeSingleInstance () {
         return false;
     }
 
-    return app.makeSingleInstance(function () {
-        if (mainWindow) {
-            if (mainWindow.isMinimized()) {
-                mainWindow.restore();
+    return electron.app.makeSingleInstance(function () {
+        let allWin = electron.BrowserWindow.getAllWindows();
+        if (allWin.length > 0) {
+            let win = allWin[allWin.length - 1];
+            if (win.isMinimized()) {
+                win.restore();
             }
-            mainWindow.focus();
+            win.focus();
         }
     });
 }

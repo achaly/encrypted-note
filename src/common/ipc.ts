@@ -1,3 +1,6 @@
+import * as electron from "electron";
+import {ENWindow} from "./window";
+import OpenDialogOptions = Electron.OpenDialogOptions;
 /**
  * main
  */
@@ -39,5 +42,16 @@ export class Action {
      */
     static SaveFile: string = 'save-file';
 
+
+}
+
+export function initIpcMain() {
+    electron.ipcMain.on(Action.NewWin, (event) => {
+        ENWindow.createWorkspace().then((win) => {});
+    });
+
+    electron.ipcMain.on(Action.OpenFile, (event, filePath) => {
+        ENWindow.createWorkspace(false, {filePath: filePath}).then((win) => {});
+    });
 
 }
