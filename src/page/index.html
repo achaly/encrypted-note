@@ -10,22 +10,25 @@
 <div id="index" v-cloak>
     <div id="ws-header">
         <div id="ws-header-left">
-            <button id="ws-btn-new" class="btn btn-default ws-btn-cls" @click="clickNewFile">
+            <button id="ws-btn-new" class="btn btn-default ws-btn-cls" @click="clickNewFile" title="New File">
                 <span class="fa fa-file-o fa-lg"></span>
             </button>
-            <button id="ws-btn-open" class="btn btn-default ws-btn-cls" @click="clickOpenFile">
+            <button id="ws-btn-open" class="btn btn-default ws-btn-cls" @click="clickOpenFile" title="Open File">
                 <span class="fa fa-folder-open-o fa-lg"></span>
             </button>
-            <button id="ws-btn-save" class="btn btn-default ws-btn-cls" @click="clickSave">
+            <button id="ws-btn-save" class="btn btn-default ws-btn-cls" @click="clickSave" title="Save">
                 <span class="fa fa-floppy-o fa-lg"></span>
+            </button>
+            <button id="ws-btn-lock" class="btn btn-default ws-btn-cls" @click="clickLock" title="Lock">
+                <span id="ws-btn-lock-icon" class="fa fa-lg" :class="{'fa-lock': isLocked, 'fa-unlock': !isLocked}"></span>
             </button>
         </div>
 
         <div id="ws-header-right">
-            <button id="ws-btn-tab" class="btn btn-default ws-btn-cls" @click="clickNewTab">
-                <span class="fa fa-paperclip fa-lg"></span>
+            <button id="ws-btn-tab" class="btn btn-default ws-btn-cls" @click="clickNewTab" title="New Tip">
+                <span class="fa fa-pencil-square-o fa-lg"></span>
             </button>
-            <button id="ws-btn-del" class="btn btn-default ws-btn-cls" @click="clickDel">
+            <button id="ws-btn-del" class="btn btn-default ws-btn-cls" @click="clickDel" title="Del Tip">
                 <span class="fa fa-trash-o fa-lg"></span>
             </button>
         </div>
@@ -40,7 +43,7 @@
         <div id="ws-sidebar">
             <ul>
                 <li v-for="item in sidebarList">
-                    <div class="ws-sidebar-item" v-bind:class="item.selected" @click="clickSidebarItem(item)">
+                    <div class="ws-sidebar-item" :class="item.selected" @click="clickSidebarItem(item)">
                         <h3>{{ item.title }}</h3>
                         <p>{{ item.createdAt }}</p>
                     </div>

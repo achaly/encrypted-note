@@ -3,7 +3,6 @@ import * as URL from "url";
 import * as Vue from "vue/dist/vue";
 import * as _ from "underscore";
 import * as electron from "electron";
-import * as alertify from "alertifyjs";
 
 import {config} from "../common/config";
 import {locale} from "../common/locale";
@@ -11,24 +10,23 @@ import {FileContent} from "../common/fileContent";
 import {generateUUID, genrateDate} from "../common/utils";
 import {Action} from "../common/ipc";
 import {ENWindow, IWindowConfig} from "../common/window";
-import {dialog} from "../common/dialog";
+import {enDialog} from "../common/enDialog";
 
 import BrowserWindow = Electron.BrowserWindow;
 import OpenDialogOptions = Electron.OpenDialogOptions;
 import SaveDialogOptions = Electron.SaveDialogOptions;
 import ShowMessageBoxOptions = Electron.ShowMessageBoxOptions;
 
-const debug = /--debug/.test(process.argv[2]);
-if (debug) {
-    electron.remote.getCurrentWindow().webContents.openDevTools();
-}
+// debug
+electron.remote.getCurrentWindow().webContents.openDevTools();
 
 new Vue({
     el: '#index',
     data: {
         filePath: null,
         fileContent: null,
-        password: 'default',
+        password: null,
+        isLocked: true,
 
         paperKey: '',
         paperText: '',
@@ -91,8 +89,6 @@ new Vue({
     methods: {
         clickBaidu(event): void {
             console.info('baidu');
-
-            // dialog.test();
         },
 
         onTabClick(event): void {
@@ -103,7 +99,6 @@ new Vue({
         },
 
         clickDrop(event): void {
-            dialog.test2();
         },
 
         processArgs(): void {
@@ -135,6 +130,8 @@ new Vue({
                     return false;
                 }
             };
+
+            document.getElementById('ws-btn-lock-icon')
         },
 
         processIpc(): void {
@@ -168,10 +165,10 @@ new Vue({
 
                 let option: ShowMessageBoxOptions = {
                     type: 'question',
-                    buttons: ['save', 'donnot save', 'cancel'],
+                    buttons: ['Save', 'Don\'t save', 'Cancel'],
                     defaultId: 0,
                     title: 'Message',
-                    message: 'Save???',
+                    message: 'Save file to disk ?',
                     cancelId: 2
                 };
                 electron.remote.dialog.showMessageBox(option, (response) => {
@@ -307,25 +304,11 @@ new Vue({
                     resolve(this.filePath);
                 }
             }).then((filePath) => {
-                if (_.isEmpty(this.password)) {
-                    return new Promise((resolve, reject) => {
-                        alertify.prompt('Input pwd', '', (event, value) => {
-                            this.password = value;
-                            resolve({
-                                filePath: filePath,
-                                password: value
-                            });
-                        }, () => {
-                            reject('cancel input pwd');
-                        });
-                    });
+                return Promise.resolve({
+                    filePath: filePath,
+                    password: this.password,
+                })
 
-                } else {
-                    return Promise.resolve({
-                        filePath: filePath,
-                        password: this.password,
-                    });
-                }
             }).then(({filePath, password}) => {
                 console.info('file path', filePath, 'pwd', password);
                 return this.fileContent.saveToFile(filePath, password);
@@ -372,29 +355,51 @@ new Vue({
         },
 
         load(filePath: string): void {
-            new Promise((resolve, reject) => {
-                if (_.isEmpty(this.password)) {
-                    alertify.prompt('Input pwd', '', (event, value) => {
-                        this.password = value;
-                        resolve({filePath, password: this.password});
-                    });
+            this.filePath = filePath;
+            let getPassword = (resolve, reject) => {
+                enDialog.prompt('Please Input Password', '', (event, value) => {
+                    this.password = value;
+                    resolve(value);
+                }, () => {
+                    reject('cancel input pwd.');
+                });
+            };
 
-                } else {
-                    resolve({filePath, password: this.password});
-                }
-            }).then(({filePath, password}) => {
-                console.info('file path', filePath, 'pwd', password);
-                this.filePath = filePath;
-                return this.fileContent.loadFromFile(this.filePath, password);
-
-            }).then((fileContent) => {
+            this.fileContent.loadFromFile(this.filePath, getPassword).then((fileContent) => {
                 this.paperKey = fileContent.papers[0].key;
                 this.paperText = fileContent.papers[0].text;
+                this.isLocked = fileContent.config.encrypted;
                 Vue.nextTick(() => {
                     this.canClose = true;
                 });
                 console.info('load file success.');
+
+            }).catch((e) => {
+                console.info('load file failed.', e);
             });
+
+        },
+
+        clickLock(event): void {
+            if (this.isLocked) {
+                this.password = null;
+                this.isLocked = false;
+            } else {
+                new Promise((resolve, reject) => {
+                    enDialog.prompt('Please Input New Password', '', (event, value) => {
+                        this.password = value;
+                        resolve(value);
+                    }, () => {
+                        reject('cancel input pwd.');
+                    });
+
+                }).then((password) => {
+                    this.password = password;
+                    this.isLocked = true;
+                }).catch(() => {
+                    // ignore.
+                });
+            }
 
         }
     },

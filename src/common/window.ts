@@ -64,7 +64,7 @@ export class ENWindow {
             minWidth: 680,
             height: 840,
             minHeight: 400,
-            title: 'xxxooo'
+            title: electron.app.getName()
         };
 
         if (option) {

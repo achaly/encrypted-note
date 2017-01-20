@@ -21,10 +21,11 @@ function initialize () {
     }
 
     // set config locale.
-    locale.setLocale(config.getLocale());
+    // locale.setLocale(config.getLocale());
 
-    console.info('app name', locale.get('appName'));
-    electron.app.setName(locale.get('appName'));
+    // console.info('app name', locale.get('appName'));
+    // electron.app.setName(locale.get('appName'));
+    electron.app.setName('Encrypted Note');
 
     function createWindow () {
         let testFilePath = '/Users/sky/Documents/workspace/encrypted-note/tempfile.ent';
