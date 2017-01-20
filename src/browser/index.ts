@@ -18,7 +18,7 @@ import SaveDialogOptions = Electron.SaveDialogOptions;
 import ShowMessageBoxOptions = Electron.ShowMessageBoxOptions;
 
 // debug
-electron.remote.getCurrentWindow().webContents.openDevTools();
+// electron.remote.getCurrentWindow().webContents.openDevTools();
 
 new Vue({
     el: '#index',
